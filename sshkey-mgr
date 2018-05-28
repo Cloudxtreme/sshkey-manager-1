@@ -1,0 +1,73 @@
+#!/bin/bash
+source lib.sh
+mgr_dir=`cd $(dirname $0);pwd`
+key_dir="$mgr_dir/sshkey"
+
+function Usage() {
+    echo "$0 { gen <name> | deploy <name> | restore <name> | upload <name> <path> | update <path>}"
+    exit 1
+}
+
+function Generate_key() {
+    name="$1"
+    mkdir -p $key_dir/$name
+    ssh-keygen -t rsa -f $key_dir/$name/$name
+    
+    # config ssh configuration
+    cp $key_dir/config_tem $key_dir/$name/config
+    sed -i "s/NAME/$name/g" $key_dir/$name/config
+    read -p "User name: " user
+    sed -i "s/USER/$user/g" $key_dir/$name/config
+    read -p "server ip: " ip
+    sed -i "s/IP/$ip/g" $key_dir/$name/config
+    sed -i "s+PATH+$key_dir/$name/$name+g" $key_dir/$name/config
+}
+
+function Deploy() {
+    name="$1"
+    ip=`cat $key_dir/$name/config | grep Hostname | awk -F " " '{print $2}'`
+
+    # scp pub key to server
+    ssh-keygen -f "/home/develop_pan/.ssh/known_hosts" -R $name
+    mkdir .ssh
+    cp $key_dir/$name/$name.pub .ssh/authorized_keys
+    scp -r .ssh dorry@$ip:~/
+    rm -r .ssh
+
+    # add config to ~/.ssh/config
+    cat $key_dir/$name/config >> ~/.ssh/config
+}
+
+case "$1" in 
+    gen)
+        Parameter_judge 2 $#
+        Generate_key $2
+        ;;
+
+    deploy)
+        Parameter_judge 2 $#
+        Deploy $2
+        ;;
+
+    restore)
+        Parameter_judge 2 $#
+        echo delete $2
+        ;;
+
+    upload)
+        Parameter_judge 3 $#
+        echo upload $2 to $3
+        ;;
+
+    update)
+        Parameter_judge 2 $#
+        echo update key from $2
+        ;;
+
+    *)
+        Usage
+        ;;
+esac
+
+
+
