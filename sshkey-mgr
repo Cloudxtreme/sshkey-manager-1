@@ -1,7 +1,10 @@
 #!/bin/bash
-source lib.sh
 mgr_dir=`cd $(dirname $0);pwd`
 key_dir="$mgr_dir/sshkey"
+
+
+source $mgr_dir/lib.sh
+
 
 function Usage() {
     echo "$0 { gen <name> | deploy <name> | restore <name> | upload <name> <path> | update <path>}"
@@ -26,6 +29,11 @@ function Generate_key() {
 function Deploy() {
     name="$1"
     ip=`cat $key_dir/$name/config | grep Hostname | awk -F " " '{print $2}'`
+
+    # authority whether host exists
+    cat ~/.ssh/config | grep "Host $name" && \
+    echo "The machine ( $name ) is already exist. " \
+    exit 1
 
     # add config to ~/.ssh/config
     cat $key_dir/$name/config >> ~/.ssh/config
