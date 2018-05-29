@@ -13,7 +13,7 @@ function Generate_key() {
     mkdir -p $key_dir/$name
     ssh-keygen -t rsa -f $key_dir/$name/$name
     
-    # config ssh configuration
+    # generate ssh configuration
     cp $key_dir/config_tem $key_dir/$name/config
     sed -i "s/NAME/$name/g" $key_dir/$name/config
     read -p "User name: " user
@@ -27,15 +27,12 @@ function Deploy() {
     name="$1"
     ip=`cat $key_dir/$name/config | grep Hostname | awk -F " " '{print $2}'`
 
-    # scp pub key to server
-    ssh-keygen -f "/home/develop_pan/.ssh/known_hosts" -R $name
-    mkdir .ssh
-    cp $key_dir/$name/$name.pub .ssh/authorized_keys
-    scp -r .ssh dorry@$ip:~/
-    rm -r .ssh
-
     # add config to ~/.ssh/config
     cat $key_dir/$name/config >> ~/.ssh/config
+    
+    # scp pub key to server
+    ssh-keygen -f "/home/develop_pan/.ssh/known_hosts" -R $name
+    ssh-copy-id -i $key_dir/$name/$name $name
 }
 
 case "$1" in 
