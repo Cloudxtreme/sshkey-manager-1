@@ -7,8 +7,18 @@ source $mgr_dir/lib.sh
 
 
 function Usage() {
-    echo "$0 { gen <name> | deploy <name> | restore <name> | upload <name> <path> | update <path>}"
+    echo "$0 { gen <name> | list | deploy <name> | restore <name> | upload <name> <path> | update <path>}"
     exit 1
+}
+
+function List() {
+    cd $key_dir/
+    number=`ls -d */ | wc -l`
+    echo "Totle:" $number
+    for key in `ls -d */`
+    do
+        tree $key
+    done
 }
 
 function Generate_key() {
@@ -32,7 +42,7 @@ function Deploy() {
 
     # authority whether host exists
     cat ~/.ssh/config | grep "Host $name" && \
-    echo "The machine ( $name ) is already exist. " \
+    echo "The machine ( $name ) is already exist. " && \
     exit 1
 
     # add config to ~/.ssh/config
@@ -41,6 +51,24 @@ function Deploy() {
     # scp pub key to server
     ssh-keygen -f "/home/develop_pan/.ssh/known_hosts" -R $name
     ssh-copy-id -i $key_dir/$name/$name $name
+}
+
+function Upload() {
+    key_name="$1"
+    direction="$2"
+    if [ ! -d $key_dir/$key_name ];then
+        echo "No such key!"
+        exit 1
+    fi
+    scp -r $key_dir/$key_name $direction
+}
+
+function Update() {
+    direction="$1"
+    host="$(cut -d':' -f1 <<< $direction)"
+    path="$(cut -d':' -f2 <<< $direction)"
+    
+    scp -r $direction/* $key_dir/
 }
 
 case "$1" in 
@@ -59,14 +87,19 @@ case "$1" in
         echo delete $2
         ;;
 
+    list )
+        Parameter_judge 1 $#
+        List
+        ;;
+
     upload)
         Parameter_judge 3 $#
-        echo upload $2 to $3
+        Upload $2 $3
         ;;
 
     update)
         Parameter_judge 2 $#
-        echo update key from $2
+        Update $2
         ;;
 
     *)
