@@ -7,7 +7,7 @@ source $mgr_dir/lib.sh
 
 
 function Usage() {
-    echo "$0 { gen <name> | list | deploy <name> | restore <name> | upload <name> <path> | update <path>}"
+    echo "$0 { list | gen <name> | deploy <name> | restore <name> | upload <name> <path> | update <path>}"
     exit 1
 }
 
@@ -80,6 +80,12 @@ function Deploy() {
     ssh-copy-id -i $key_dir/$name/$name $name
 }
 
+function Restore() {
+    name="$1"
+    hint "Remove $name.conf in ~/.ssh/config.d/"
+    rm $HOME/.ssh/config.d/$name.conf
+}
+
 function Upload() {
     key_name="$1"
     direction="$2"
@@ -111,7 +117,7 @@ case "$1" in
 
     restore)
         Parameter_judge 2 $#
-        echo delete $2
+        Restore $2
         ;;
 
     list )
