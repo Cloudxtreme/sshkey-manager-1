@@ -24,31 +24,58 @@ function List() {
 function Generate_key() {
     name="$1"
     mkdir -p $key_dir/$name
+
+    hint "generate ssh key"
     ssh-keygen -t rsa -f $key_dir/$name/$name
     
-    # generate ssh configuration
-    cp $key_dir/config_tem $key_dir/$name/config
-    sed -i "s/NAME/$name/g" $key_dir/$name/config
+    hint "generate ssh configuration"
+    configuration="$key_dir/$name/$name.conf"
+
     read -p "User name: " user
-    sed -i "s/USER/$user/g" $key_dir/$name/config
     read -p "server ip: " ip
-    sed -i "s/IP/$ip/g" $key_dir/$name/config
-    sed -i "s+PATH+$key_dir/$name/$name+g" $key_dir/$name/config
+
+    cp $key_dir/config_tem $configuration
+
+    sed -i "s/IP/$ip/g" $configuration
+    sed -i "s/NAME/$name/g" $configuration
+    sed -i "s/USER/$user/g" $configuration
+    sed -i "s+PATH+$key_dir/$name/$name+g" $configuration
 }
 
 function Deploy() {
     name="$1"
-    ip=`cat $key_dir/$name/config | grep Hostname | awk -F " " '{print $2}'`
+    ip=`cat $key_dir/$name/$name.conf | grep Hostname | awk -F " " '{print $2}'`
 
-    # authority whether host exists
+    # create ~/.ssh/config.d if there is no such directory
+    if [ ! -d "$HOME/.ssh/config.d" ];then
+        hint "create directory : ~/.ssh/config.d"
+        mkdir ~/.ssh/config.d
+    fi
+
+    # add "Include config.d/*"to ~/.ssh/config if there is no such line
+    if [ -z "$(cat $HOME/.ssh/config | grep 'Include config.d/*')" ];then 
+        sed -i '1 i\Include config.d/*' $HOME/.ssh/config
+    fi
+
+    # authority
+    hint "authority whether host exists"
     cat ~/.ssh/config | grep "Host $name" && \
-    echo "The machine ( $name ) is already exist. " && \
+    echo "The machine ( $name ) is already exist in ~/.ssh/config " && \
     exit 1
 
-    # add config to ~/.ssh/config
-    cat $key_dir/$name/config >> ~/.ssh/config
+    ls ~/.ssh/config.d | grep $name.conf && \
+    echo "The machine ( $name ) configuration is already exist in ~/.ssh/config.d/" && \
+    exit 1
+
+    echo "No machine named $name"
+
+    # add config to ~/.ssh/config.d
+    hint "Copy configuration to ~/.ssh/config.d"
+    cp $key_dir/$name/$name.conf $HOME/.ssh/config.d/
+    ls $HOME/.ssh/config.d/ | grep $name.conf
     
     # scp pub key to server
+    hint "sent public key to server"
     ssh-keygen -f "/home/develop_pan/.ssh/known_hosts" -R $name
     ssh-copy-id -i $key_dir/$name/$name $name
 }
