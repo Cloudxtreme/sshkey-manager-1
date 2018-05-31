@@ -82,6 +82,11 @@ function Deploy() {
 
 function Restore() {
     name="$1"
+
+    hint "remove the public in server"
+    pub_key=`cat $key_dir/$name/$name.pub`
+    ssh $name -C "sed -i 's#$pub_key# #' ~/.ssh/authorized_keys"
+
     hint "Remove $name.conf in ~/.ssh/config.d/"
     rm $HOME/.ssh/config.d/$name.conf
 }
