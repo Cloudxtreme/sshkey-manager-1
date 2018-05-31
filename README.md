@@ -78,7 +78,7 @@ $ ssh test
 
 
 ## restore the configuration
-This action will delete the ssh related configuration in `~/.ssh/config.d/`.
+This action will delete the ssh related configuration in `~/.ssh/config.d/` and the public key in server.
 ```shell
 $ ./sshkey-mgr restore <name>
 ```
