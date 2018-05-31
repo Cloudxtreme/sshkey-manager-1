@@ -7,7 +7,7 @@ source $mgr_dir/lib.sh
 
 
 function Usage() {
-    echo "$0 { list | gen <name> | deploy <name> | restore <name> | upload <name> <path> | update <path>}"
+    echo "$0 { list | gen <name> | deploy <name> | restore <name> | upload <name> <path> | update <path> <name>}"
     exit 1
 }
 
@@ -103,10 +103,12 @@ function Upload() {
 
 function Update() {
     direction="$1"
+    name="$2"
+
     host="$(cut -d':' -f1 <<< $direction)"
     path="$(cut -d':' -f2 <<< $direction)"
     
-    scp -r $direction/* $key_dir/
+    scp -r $direction/$name $key_dir/
 }
 
 case "$1" in 
@@ -136,8 +138,8 @@ case "$1" in
         ;;
 
     update)
-        Parameter_judge 2 $#
-        Update $2
+        Parameter_judge 3 $#
+        Update $2 $3
         ;;
 
     *)
