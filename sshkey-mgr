@@ -39,7 +39,6 @@ function Generate_key() {
     sed -i "s/IP/$ip/g" $configuration
     sed -i "s/NAME/$name/g" $configuration
     sed -i "s/USER/$user/g" $configuration
-    sed -i "s+PATH+$key_dir/$name/$name+g" $configuration
 }
 
 function Deploy() {
@@ -72,7 +71,9 @@ function Deploy() {
     # add config to ~/.ssh/config.d
     hint "Copy configuration to ~/.ssh/config.d"
     cp $key_dir/$name/$name.conf $HOME/.ssh/config.d/
-    ls $HOME/.ssh/config.d/ | grep $name.conf
+    sed -i "s+PATH+$key_dir/$name/$name+g" $HOME/.ssh/config.d/$name.conf
+
+    cat $HOME/.ssh/config.d/$name.conf
     
     # scp pub key to server
     hint "sent public key to server"
