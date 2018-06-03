@@ -1,0 +1,96 @@
+#!/bin/bash
+mgr_dir=`cd $(dirname $0);pwd`
+key_dir="$mgr_dir/sshkey"
+
+function Usage() {
+    echo "$0 { list | deploy <name> | restore <name> | update <path> <name> }"
+    exit 1
+}
+
+function List() {
+    cd $key_dir/
+    number=`ls -d */ | wc -l`
+    echo "Totle:" $number
+    for key in `ls -d */`
+    do
+        tree $key
+    done
+}
+
+function Deploy() {
+    name="$1"
+    ip=`cat $key_dir/$name/$name.conf | grep Hostname | awk -F " " '{print $2}'`
+
+    # create ~/.ssh/config.d if there is no such directory
+    if [ ! -d "$HOME/.ssh/config.d" ];then
+        hint "create directory : ~/.ssh/config.d"
+        mkdir ~/.ssh/config.d
+    fi
+
+    # add "Include config.d/*"to ~/.ssh/config if there is no such line
+    if [ -z "$(cat $HOME/.ssh/config | grep 'Include config.d/*')" ];then 
+        sed -i '1 i\Include config.d/*' $HOME/.ssh/config
+    fi
+
+    # authority
+    hint "authority whether host exists"
+    cat ~/.ssh/config | grep "Host $name" && \
+    echo "The machine ( $name ) is already exist in ~/.ssh/config " && \
+    exit 1
+
+    ls ~/.ssh/config.d | grep $name.conf && \
+    echo "The machine ( $name ) configuration is already exist in ~/.ssh/config.d/" && \
+    exit 1
+
+    echo "No machine named $name"
+
+    # add config to ~/.ssh/config.d
+    hint "Copy configuration to ~/.ssh/config.d"
+    cp $key_dir/$name/$name.conf $HOME/.ssh/config.d/
+    sed -i "s+PATH+$key_dir/$name/$name+g" $HOME/.ssh/config.d/$name.conf
+
+    cat $HOME/.ssh/config.d/$name.conf
+}
+
+function Restore() {
+    name="$1"
+
+    hint "Remove $name.conf in ~/.ssh/config.d/"
+    rm $HOME/.ssh/config.d/$name.conf
+}
+
+function Update() {
+    direction="$1"
+    name="$2"
+
+    host="$(cut -d':' -f1 <<< $direction)"
+    path="$(cut -d':' -f2 <<< $direction)"
+    
+    scp -r $direction/$name $key_dir/
+}
+
+case "$1" in 
+    deploy)
+        Parameter_judge 2 $#
+        Deploy $2
+        ;;
+
+    restore)
+        Parameter_judge 2 $#
+        Restore $2
+        ;;
+
+    list)
+        Parameter_judge 1 $#
+        List
+        ;;
+
+    update)
+        Parameter_judge 3 $#
+        Update $2 $3
+        ;;
+
+    *)
+        Usage
+        ;;
+esac
