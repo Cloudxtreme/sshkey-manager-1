@@ -1,7 +1,7 @@
 # sshkey-manager
 
 # Description
-This project help you generate, deploy, store and upload to someplace.
+This project help you generate, deploy, store and upload ssh key to someplace.
 * system : ubuntu 16.04
 * architecture : x86
 * language : shell
@@ -16,7 +16,7 @@ This project help you generate, deploy, store and upload to someplace.
     $ ssh -V
     ```
 
-    In my system `ubuntu 16.04`, I can not use command `apt update ;apt upgrade` to update my openssh version higher than 7.2(reason is [here](https://serverpilot.io/community/articles/upgrading-openssh-on-ubuntu-lts.html)). If you ssh version is lower than 7.3, we offer a script to help you quick install openssh 7.3p1.
+    In my system `ubuntu 16.04`, I can not use command `apt update ;apt upgrade` to update my openssh version higher than 7.2(reason is [here](https://serverpilot.io/community/articles/upgrading-openssh-on-ubuntu-lts.html)). If your ssh version is lower than 7.3, we offer a script to help you quick install openssh 7.3p1.
     ```shell
     $ ./update_ssh_7.3.sh
     ```
