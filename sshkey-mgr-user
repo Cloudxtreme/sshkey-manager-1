@@ -5,7 +5,7 @@ key_dir="$mgr_dir/sshkey"
 source $mgr_dir/lib.sh
 
 function Usage() {
-    echo "$0 { list | deploy <name> | restore <name> | update <path> <name> }"
+    echo "$0 { list | deploy <name> | restore <name> | update <path> <name>/all }"
     exit 1
 }
 
