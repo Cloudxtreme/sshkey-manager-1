@@ -2,6 +2,8 @@
 mgr_dir=`cd $(dirname $0);pwd`
 key_dir="$mgr_dir/sshkey"
 
+source $mgr_dir/lib.sh
+
 function Usage() {
     echo "$0 { list | deploy <name> | restore <name> | update <path> <name> }"
     exit 1
@@ -63,10 +65,15 @@ function Update() {
     direction="$1"
     name="$2"
 
+    if [ "$name" == "all" ];then
+        sudo scp -r $direction/* $key_dir
+        exit 1
+    fi
+
     host="$(cut -d':' -f1 <<< $direction)"
     path="$(cut -d':' -f2 <<< $direction)"
     
-    scp -r $direction/$name $key_dir/
+    sudo scp -r $direction/$name $key_dir
 }
 
 case "$1" in 
