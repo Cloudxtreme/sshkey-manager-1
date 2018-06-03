@@ -66,14 +66,14 @@ function Update() {
     name="$2"
 
     if [ "$name" == "all" ];then
-        sudo scp -r $direction/* $key_dir
+        scp -r $direction/* $key_dir
         exit 1
     fi
 
     host="$(cut -d':' -f1 <<< $direction)"
     path="$(cut -d':' -f2 <<< $direction)"
     
-    sudo scp -r $direction/$name $key_dir
+    scp -r $direction/$name $key_dir
 }
 
 case "$1" in 
