@@ -2,29 +2,29 @@
 
 # Description
 This project helps you generate, deploy, store and upload ssh key.
-* OS : ubuntu 16.04
+* OS : Ubuntu 16.04
 * Architecture : x86
 * Language : shell
 
 # Preparation
 1. openssh (7.3 or up)
   
-    This project need the version of `openssh` is 7.3p1 or up. 
+    This project requires the version of `openssh` 7.3p1 or up. 
     
-    Check the openssh version:
+    Check the `openssh` version:
     ```shell
     $ ssh -V
     ```
-    ps: In system `ubuntu 16.04` or lower, openssh cannot update version higher than 7.2 by using `apt` command(reason is [here](https://serverpilot.io/community/articles/upgrading-openssh-on-ubuntu-lts.html)). 
+    >In system `ubuntu 16.04` or lower, openssh cannot update version higher than 7.2 by using `apt` command ( reason is [here](https://serverpilot.io/community/articles/upgrading-openssh-on-ubuntu-lts.html) ). 
     
-    If your ssh version is lower than 7.3, we offer some script to help you quickly install openssh 7.3, 7.4, 7.5.
+    If your ssh version is lower than 7.3, we offer some scripts to help you install openssh 7.3, 7.4, 7.5 quickly.
     ```shell
     $ ./update_ssh_7.3.sh
     $ ./update_ssh_7.4.sh
     $ ./update_ssh_7.5.sh
     ```
 
-    Also, we offer scripts to uninstall those openssh.
+    Also, we provide scripts to uninstall those openssh.
     ```shell
     # uninstall 7.3 or 7.5
     $ ./uninstall_openssh.sh
@@ -32,29 +32,32 @@ This project helps you generate, deploy, store and upload ssh key.
     # uninstall 7.4
     $ ./uninstall_ssh_7.4.sh
     ```
-    ps: more information about ssh configuration option, see [here](http://manpages.ubuntu.com/manpages/trusty/man5/ssh_config.5.html)
+    >For more information about ssh configuration option, see [here](http://manpages.ubuntu.com/manpages/trusty/man5/ssh_config.5.html)
 
 
 # Usage 
 ## admin
 * definition:
-have the permission to config server, generate ssh key and upload ssh key to remote.
+The admin has the permission to config server, generate ssh key and upload ssh key to remote.
 * usage:
-```shell
-$ ./sshkey-mgr-admin { list | gen <name> | deploy <name> | restore <name> | upload <name> <destination> | update <destination> <name> }
-```
+    ```shell
+    $ ./sshkey-mgr-admin { list | gen <name> | deploy <name> | restore <name> | upload <name> <storage> | update <storage> <name>/all }
+    ```
+
 ## user 
 * usage
-```shell
-$ ./sshkey-mgr-user { list | deploy <name> | restore <name> | update <destination> <name>/all }
-```
+    ```shell
+    $ ./sshkey-mgr-user { list | deploy <name> | restore <name> | update <storage> <name>/all }
+    ```
+
 ## parameter
-* `<name>` : the name of the host. In order to remember and recognize easily, we make the host name the same with key name.
-* `<destination>` : the destination of your ssh key storage.
-```
-format:
-[user]@[domain]:[path]
-```
+* `<name>` : the name of the server. In order to remember and recognize easily, we make the server name the same as key name.
+
+* `<storage>` : the storage of your ssh key.
+    ```
+    format:
+    [user]@[domain]:[path]
+    ```
 
 # For Admin
 ## Generate ssh key
@@ -62,15 +65,26 @@ format:
 ```shell
 $ ./sshkey-mgr-admin gen <name>
 ```
-This action generates ssh key and its configuration in `sshkey/<name>/`. There are the ssh private key `<name>`, the ssh public key `<name>.pub` and the ssh configuration `<name>.conf`.
+This action generates ssh key and its configuration in `sshkey/<name>/`. The structure is like below:
+```
+sshkey/<name>/
+├── <name>
+├── <name>.conf
+└── <name>.pub
+```
     
-For example, I generate a key named `test`:
+For example, you want to generate a key named `test`:
 ```shell
 # generate key
-$ ./sshkey-mgr gen <name>
+$ ./sshkey-mgr-admin gen <name>
+# follow the hint 
+# 1. enter the passphrase of your ssh key
+# 2. enter the user name of your server
+# 3. enter the ip of your server
 
-# list the key
-$ ./sshkey-mgr list
+
+# list the key(s)
+$ ./sshkey-mgr-admin list
 test/
 ├── test
 ├── test.conf
@@ -85,14 +99,14 @@ test/
 ```shell
 $ ./sshkey-mgr-admin deploy <name>
 ```
-This action configs <name> ssh configuration to your host and **sends public key to the server**.
+This action deploys `<name>` ssh configuration to your host and **sends public key to the server**.
 
-After this action, you can ssh to you server.
+After this action, you can ssh to you server with the command below:
 ```shell
 $ ssh <name>
 ```
     
-For example, I want to deploy the key `test`: 
+For example, you have just generated a key name `test` successfully and you want to deploy the key to your host: 
 ```shell
 $ ./sshkey-mgr-admin deploy test
 $ ssh test
@@ -103,72 +117,78 @@ $ ssh test
 ```shell
 $ ./sshkey-mgr-admin restore <name>
 ```
-This action deletes the ssh related configuration in `~/.ssh/config.d/` and **the public key in server**.
+This action deletes the ssh related configuration in `~/.ssh/config.d/` and **removes the public key in server**.
 
     
 
-## list the existed keys
+## List the existed keys
 ```shell
 $ ./sshkey-mgr-admin list
 ```
 
 
-## upload ssh key from host to remote
-This action will send the key `<name>` to `<destination>` by using scp command.
+## Upload ssh key from host to remote
+This action uploads the key `<name>` from your host to `<storage>` by using scp command.
 ```shell
-$ ./sshkey-mgr-admin upload <name> <destination>
+$ ./sshkey-mgr-admin upload <name> <storage>
 ```
 
-For example:
+For example, you have generate a key named `test` and you want to backup it to `xiaoming@192.168.20.1:~/sshkey-storage/`:
 ```shell
 $ ./sshkey-mgr-admin upload test xiaoming@192.168.20.1:~/sshkey-storage/
 ``` 
 
-ps: The propose we design this feature is to offer an interface to share the key with others or just backup your key(s). You can send the key to one's machine or a file share system such as Samba.
+>The purpose we design this feature is to provide an interface to share the key with others or just backup your key(s). By using this sub-command, you can send the key to one's machine or a file share system such as Samba.
 
-## update host ssh key from remote
-This action will copy the contents in `<destination>`.
+## Fetch ssh key from remote
+This action fetchs the specified directory `<name>` from `<storage>` to your host.
 ```shell
-$ ./sshkey-mgr-admin update <destination>
+$ ./sshkey-mgr-admin fetch <storage> <name>/all 
 ```
 
 For example:
-```shell
-$ ./sshkey-mgr-admin update xiaoming@192.168.20.1:~/sshkey-storage/
-``` 
+
+* You want to fetch the ssh key named `test` in `xiaoming@192.168.20.1:~/sshkey-storage/`
+    ```shell
+    $ ./sshkey-mgr-admin update xiaoming@192.168.20.1:~/sshkey-storage/ test
+    ```
+* You want to fetch all the ssh key in `xiaoming@192.168.20.1:~/sshkey-storage/` 
+    ```shell
+    $ ./sshkey-mgr-admin update xiaoming@192.168.20.1:~/sshkey-storage/ all
+    ```
 
 # For user
 
-## update host ssh key from remote
-This action will copy the contents in `<destination>`.
+## Fetch ssh key from remote
+This action fetch the specified `<name>` directory from `<storage>` to your host.
 ```shell
-$ ./sshkey-mgr-user update <destination> <name>/all
+$ ./sshkey-mgr-user update <storage> <name>/all
 ```
 
 For example:
 
-* I want the ssh key named `test` in `xiaoming@192.168.20.1:~/sshkey-storage/`
-```shell
-$ ./sshkey-mgr-user update xiaoming@192.168.20.1:~/sshkey-storage/ test
-```
-* I want all the ssh key in `xiaoming@192.168.20.1:~/sshkey-storage/` 
-```shell
-$ ./sshkey-mgr-user update xiaoming@192.168.20.1:~/sshkey-storage/ all
-```
+* You want to fetch the ssh key named `test` in `xiaoming@192.168.20.1:~/sshkey-storage/`
+    ```shell
+    $ ./sshkey-mgr-user update xiaoming@192.168.20.1:~/sshkey-storage/ test
+    ```
+* You want to fetch all the ssh key in `xiaoming@192.168.20.1:~/sshkey-storage/` 
+    ```shell
+    $ ./sshkey-mgr-user update xiaoming@192.168.20.1:~/sshkey-storage/ all
+    ```
 
 ## Deploy the ssh configuration
 
 ```shell
 $ ./sshkey-mgr-user deploy <name>
 ```
-This action configs <name> ssh configuration to your host.
+This action deploys `<name>` ssh configuration on your host.
 
 After this action, you can ssh to you server.
 ```shell
 $ ssh <name>
 ```
     
-For example, I want to deploy the key `test`: 
+For example, you want to deploy the key `test`: 
 ```shell
 $ ./sshkey-mgr-user deploy test
 $ ssh test
@@ -182,7 +202,7 @@ $ ./sshkey-mgr-user restore <name>
 This action deletes the ssh related configuration in `~/.ssh/config.d/`.
 
     
-## list the existed keys
+## List the existed keys
 ```shell
 $ ./sshkey-mgr-user list
 ```
@@ -191,13 +211,13 @@ $ ./sshkey-mgr-user list
 # Advanced
 1. autocomplete
 
-    According to my research, openssh seems not support autocomplete of your Host name in ssh configuration.So we offer a script to config the autocomplete.
+    According to my research, openssh seems not support autocomplete of your Host name in ssh configuration. So we provide a script to config the autocomplete.
     ```shell
     $ cd autocomplete/
     $ ./autocomplete.sh
     ```
 
-    This need the sudo permission to copy file `ssh` to `/etc/bash_completion.d/`.
-    After running the script, you need to open another terminal to check it work.
+    This needs the sudo permission to copy configuration file `ssh` to `/etc/bash_completion.d/`.
+    After running the script, you need to open another terminal to check whether it is work.
 
-    ps: more information of autocomplete configuration, see [here](https://debian-administration.org/article/317/An_introduction_to_bash_completion_part_2)
+    > For more information about autocomplete configuration, see [here](https://debian-administration.org/article/317/An_introduction_to_bash_completion_part_2)
