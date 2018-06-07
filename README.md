@@ -49,7 +49,7 @@ $ ./sshkey-mgr-admin { list | gen <name> | deploy <name> | restore <name> | uplo
 $ ./sshkey-mgr-user { list | deploy <name> | restore <name> | update <destination> <name>/all }
 ```
 ## parameter
-* `<name>` : the name of host. In order to remember and recognize easily, we let the host name the same with key name.
+* `<name>` : the name of the host. In order to remember and recognize easily, we make the host name the same with key name.
 * `<destination>` : the destination of your ssh key storage.
 ```
 format:
