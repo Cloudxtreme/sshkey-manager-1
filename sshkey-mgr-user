@@ -23,6 +23,17 @@ function Deploy() {
     name="$1"
     ip=`cat $key_dir/$name/$name.conf | grep Hostname | awk -F " " '{print $2}'`
 
+    # create ~/.ssh/config if there is no such file
+    if [ ! -f "$HOME/.ssh/config" ];then
+        hint "check ~/.ssh/config exists"
+        touch $HOME/.ssh/config
+    fi
+
+    # check whether ~/.ssh/config have content
+    if [ -z "$(cat $HOME/.ssh/config)" ];then
+        echo > $HOME/.ssh/config
+    fi
+
     # create ~/.ssh/config.d if there is no such directory
     if [ ! -d "$HOME/.ssh/config.d" ];then
         hint "create directory : ~/.ssh/config.d"
