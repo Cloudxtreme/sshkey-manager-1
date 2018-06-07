@@ -7,18 +7,8 @@ source $mgr_dir/lib.sh
 
 
 function Usage() {
-    echo "$0 { list | gen <name> | deploy <name> | restore <name> | upload <name> <path> | update <path> <name>}"
+    echo "$0 { list | gen <name> | deploy <name> | restore <name> | upload <name> <storage> | fetch <storage> <name>}"
     exit 1
-}
-
-function List() {
-    cd $key_dir/
-    number=`ls -d */ | wc -l`
-    echo "Totle:" $number
-    for key in `ls -d */`
-    do
-        tree $key
-    done
 }
 
 function Generate_key() {
@@ -113,15 +103,6 @@ function Upload() {
     scp -r $key_dir/$key_name $direction
 }
 
-function Update() {
-    direction="$1"
-    name="$2"
-
-    host="$(cut -d':' -f1 <<< $direction)"
-    path="$(cut -d':' -f2 <<< $direction)"
-    
-    scp -r $direction/$name $key_dir/
-}
 
 case "$1" in 
     gen)
@@ -149,9 +130,9 @@ case "$1" in
         Upload $2 $3
         ;;
 
-    update)
+    fetch)
         Parameter_judge 3 $#
-        Update $2 $3
+        Fetch $2 $3
         ;;
 
     *)
