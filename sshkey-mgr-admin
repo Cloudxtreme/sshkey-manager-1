@@ -7,7 +7,7 @@ source $mgr_dir/lib.sh
 
 
 function Usage() {
-    echo "$0 { list | gen <name> | deploy <name> | restore <name> | upload <name> <storage> | fetch <storage> <name>}"
+    echo "$0 { list | gen <name> | deploy-c <name> | deploy-s <name> | restore-c <name> | restore-s <name> | upload <name> <storage> | fetch <storage> <name>/all }"
     exit 1
 }
 
@@ -31,66 +31,20 @@ function Generate_key() {
     sed -i "s/USER/$user/g" $configuration
 }
 
-function Deploy() {
+function Deploy_Server() {
     name="$1"
-    ip=`cat $key_dir/$name/$name.conf | grep Hostname | awk -F " " '{print $2}'`
-
-    # create ~/.ssh/config if there is no such file
-    if [ ! -f "$HOME/.ssh/config" ];then
-        hint "check ~/.ssh/config exists"
-        touch $HOME/.ssh/config
-    fi
-
-    # check whether ~/.ssh/config have content
-    if [ -z "$(cat $HOME/.ssh/config)" ];then
-        echo > $HOME/.ssh/config
-    fi
-
-    # create ~/.ssh/config.d if there is no such directory
-    if [ ! -d "$HOME/.ssh/config.d" ];then
-        hint "create directory : ~/.ssh/config.d"
-        mkdir $HOME/.ssh/config.d
-    fi
-
-    # add "Include config.d/*"to ~/.ssh/config if there is no such line
-    if [ -z "$(cat $HOME/.ssh/config | grep 'Include config.d/*')" ];then 
-        sed -i '1 i\Include config.d/*' $HOME/.ssh/config
-    fi
-
-    # authority
-    hint "authority whether host exists"
-    cat ~/.ssh/config | grep "Host $name" && \
-    echo "The machine ( $name ) is already exist in ~/.ssh/config " && \
-    exit 1
-
-    ls ~/.ssh/config.d | grep $name.conf && \
-    echo "The machine ( $name ) configuration is already exist in ~/.ssh/config.d/" && \
-    exit 1
-
-    echo "No machine named $name"
-
-    # add config to ~/.ssh/config.d
-    hint "Copy configuration to ~/.ssh/config.d"
-    cp $key_dir/$name/$name.conf $HOME/.ssh/config.d/
-    sed -i "s+PATH+$key_dir/$name/$name+g" $HOME/.ssh/config.d/$name.conf
-
-    cat $HOME/.ssh/config.d/$name.conf
-    
     # scp pub key to server
     hint "sent public key to server"
     ssh-keygen -f "/home/develop_pan/.ssh/known_hosts" -R $name
     ssh-copy-id -i $key_dir/$name/$name $name
 }
 
-function Restore() {
+function Restore_Server() {
     name="$1"
 
     hint "remove the public in server"
     pub_key=`cat $key_dir/$name/$name.pub`
     ssh $name -C "sed -i 's#$pub_key# #' ~/.ssh/authorized_keys"
-
-    hint "Remove $name.conf in ~/.ssh/config.d/"
-    rm $HOME/.ssh/config.d/$name.conf
 }
 
 function Upload() {
@@ -110,14 +64,24 @@ case "$1" in
         Generate_key $2
         ;;
 
-    deploy)
+    deploy-c)
         Parameter_judge 2 $#
-        Deploy $2
+        Deploy_Client $2
         ;;
 
-    restore)
+    deploy-s)
         Parameter_judge 2 $#
-        Restore $2
+        Deploy_Server $2
+        ;;
+
+    restore-c)
+        Parameter_judge 2 $#
+        Restore_Client $2
+        ;;
+
+    restore-s)
+        Parameter_judge 2 $#
+        Restore_Server $2
         ;;
 
     list)

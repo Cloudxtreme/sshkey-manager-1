@@ -42,3 +42,56 @@ function Fetch() {
     
     scp -r $direction/$name $key_dir
 }
+
+function Deploy_Client() {
+    name="$1"
+    ip=`cat $key_dir/$name/$name.conf | grep Hostname | awk -F " " '{print $2}'`
+
+    # create ~/.ssh/config if there is no such file
+    if [ ! -f "$HOME/.ssh/config" ];then
+        hint "check ~/.ssh/config exists"
+        touch $HOME/.ssh/config
+    fi
+
+    # check whether ~/.ssh/config have content
+    if [ -z "$(cat $HOME/.ssh/config)" ];then
+        echo > $HOME/.ssh/config
+    fi
+
+    # create ~/.ssh/config.d if there is no such directory
+    if [ ! -d "$HOME/.ssh/config.d" ];then
+        hint "create directory : ~/.ssh/config.d"
+        mkdir $HOME/.ssh/config.d
+    fi
+
+    # add "Include config.d/*"to ~/.ssh/config if there is no such line
+    if [ -z "$(cat $HOME/.ssh/config | grep 'Include config.d/*')" ];then 
+        sed -i '1 i\Include config.d/*' $HOME/.ssh/config
+    fi
+
+    # authority
+    hint "authority whether host exists"
+    cat ~/.ssh/config | grep "Host $name" && \
+    echo "The machine ( $name ) is already exist in ~/.ssh/config " && \
+    exit 1
+
+    ls ~/.ssh/config.d | grep $name.conf && \
+    echo "The machine ( $name ) configuration is already exist in ~/.ssh/config.d/" && \
+    exit 1
+
+    echo "No machine named $name"
+
+    # add config to ~/.ssh/config.d
+    hint "Copy configuration to ~/.ssh/config.d"
+    cp $key_dir/$name/$name.conf $HOME/.ssh/config.d/
+    sed -i "s+PATH+$key_dir/$name/$name+g" $HOME/.ssh/config.d/$name.conf
+
+    cat $HOME/.ssh/config.d/$name.conf
+}
+
+function Restore_Client() {
+    name="$1"
+
+    hint "Remove $name.conf in ~/.ssh/config.d/"
+    rm $HOME/.ssh/config.d/$name.conf
+}

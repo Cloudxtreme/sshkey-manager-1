@@ -41,13 +41,13 @@ This project helps you generate, deploy, store and upload ssh key.
 The admin has the permission to config server, generate ssh key and upload ssh key to remote.
 * usage:
     ```shell
-    $ ./sshkey-mgr-admin { list | gen <name> | deploy <name> | restore <name> | upload <name> <storage> | update <storage> <name>/all }
+    $ ./sshkey-mgr-admin { list | gen <name> | deploy-c <name> | deploy-s <name> | restore-c <name> | restore-s <name> | upload <name> <storage> | fetch <storage> <name>/all }
     ```
 
 ## user 
 * usage
     ```shell
-    $ ./sshkey-mgr-user { list | deploy <name> | restore <name> | update <storage> <name>/all }
+    $ ./sshkey-mgr-user { list | deploy-c <name> | restore-c <name> | fetch <storage> <name>/all }
     ```
 
 ## parameter
@@ -94,30 +94,46 @@ test/
 ```
 
 
-## Deploy the ssh configuration
+## Deploy the ssh configuration 
+### host
 
 ```shell
-$ ./sshkey-mgr-admin deploy <name>
+$ ./sshkey-mgr-admin deploy-c <name>
 ```
-This action deploys `<name>` ssh configuration to your host and **sends public key to the server**.
+This action deploys `<name>` ssh configuration to your host.
 
-After this action, you can ssh to you server with the command below:
+### server
+
+```shell
+$ ./sshkey-mgr-admin deploy-s <name>
+```
+This action sends the public key to server.
+
+After those two action, you can ssh to you server with the command below:
 ```shell
 $ ssh <name>
 ```
-    
-For example, you have just generated a key name `test` successfully and you want to deploy the key to your host: 
+
+For example, you have just generated a key name `test` successfully and you want to deploy the key to your host and server: 
 ```shell
-$ ./sshkey-mgr-admin deploy test
+$ ./sshkey-mgr-admin deploy-c test
+$ ./sshkey-mgr-admin deploy-s test
 $ ssh test
 ```
 
 
 ## Restore the configuration
+### host
 ```shell
-$ ./sshkey-mgr-admin restore <name>
+$ ./sshkey-mgr-admin restore-c <name>
 ```
-This action deletes the ssh related configuration in `~/.ssh/config.d/` and **removes the public key in server**.
+This action deletes the ssh related configuration in `~/.ssh/config.d/` 
+
+### server
+```shell
+$ ./sshkey-mgr-admin restore-s <name>
+```
+This action removes the public key in server.
 
     
 
@@ -179,7 +195,7 @@ For example:
 ## Deploy the ssh configuration
 
 ```shell
-$ ./sshkey-mgr-user deploy <name>
+$ ./sshkey-mgr-user deploy-c <name>
 ```
 This action deploys `<name>` ssh configuration on your host.
 
@@ -190,14 +206,14 @@ $ ssh <name>
     
 For example, you want to deploy the key `test`: 
 ```shell
-$ ./sshkey-mgr-user deploy test
+$ ./sshkey-mgr-user deploy-c test
 $ ssh test
 ```
 
 
 ## Restore the configuration
 ```shell
-$ ./sshkey-mgr-user restore <name>
+$ ./sshkey-mgr-user restore-c <name>
 ```
 This action deletes the ssh related configuration in `~/.ssh/config.d/`.
 
