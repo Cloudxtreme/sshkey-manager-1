@@ -124,7 +124,7 @@ For example:
 $ ./sshkey-mgr-admin upload test xiaoming@192.168.20.1:~/sshkey-storage/
 ``` 
 
-ps: The propose we design this feature is to offer a interface to share the key with others or just backup your key(s). You can send the key to one's machine or a file share system such as Samba.
+ps: The propose we design this feature is to offer an interface to share the key with others or just backup your key(s). You can send the key to one's machine or a file share system such as Samba.
 
 ## update host ssh key from remote
 This action will copy the contents in `<destination>`.
@@ -198,5 +198,6 @@ $ ./sshkey-mgr-user list
     ```
 
     This need the sudo permission to copy file `ssh` to `/etc/bash_completion.d/`.
+    After running the script, you need to open another terminal to check it work.
 
     ps: more information of autocomplete configuration, see [here](https://debian-administration.org/article/317/An_introduction_to_bash_completion_part_2)
