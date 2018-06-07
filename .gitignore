@@ -1,2 +1,5 @@
 sshkey/*
 *.deb
+.vscode/*
+openssh-7.4p1/*
+*.gz
