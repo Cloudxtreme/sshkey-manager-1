@@ -15,7 +15,7 @@ This project helps you generate, deploy, store and upload ssh key.
     ```shell
     $ ssh -V
     ```
-    >In system `ubuntu 16.04` or lower, openssh cannot update version higher than 7.2 by using `apt` command ( reason is [here](https://serverpilot.io/community/articles/upgrading-openssh-on-ubuntu-lts.html) ). 
+    > In system `ubuntu 16.04` or lower, openssh cannot update version higher than 7.2 by using `apt` command ( reason is [here](https://serverpilot.io/community/articles/upgrading-openssh-on-ubuntu-lts.html) ). 
     
     If your ssh version is lower than 7.3, we offer some scripts to help you install openssh 7.3, 7.4, 7.5 quickly.
     ```shell
@@ -32,7 +32,7 @@ This project helps you generate, deploy, store and upload ssh key.
     # uninstall 7.4
     $ ./uninstall_ssh_7.4.sh
     ```
-    >For more information about ssh configuration option, see [here](http://manpages.ubuntu.com/manpages/trusty/man5/ssh_config.5.html)
+    > For more information about ssh configuration option, see [here](http://manpages.ubuntu.com/manpages/trusty/man5/ssh_config.5.html)
 
 
 # Usage 
@@ -149,7 +149,7 @@ This action uploads the key `<name>` from your host to `<storage>` by using scp 
 $ ./sshkey-mgr-admin upload <name> <storage>
 ```
 
-For example, you have generate a key named `test` and you want to backup it to `xiaoming@192.168.20.1:~/sshkey-storage/`:
+For example, you have generated a key named `test` and you want to backup it to `xiaoming@192.168.20.1:~/sshkey-storage/`:
 ```shell
 $ ./sshkey-mgr-admin upload test xiaoming@192.168.20.1:~/sshkey-storage/
 ``` 
