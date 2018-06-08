@@ -60,12 +60,12 @@ The admin has the permission to config server, generate ssh key and upload ssh k
     ```
 
 # For Admin
-## Generate ssh key
+## Generate ssh configuration
 
 ```shell
 $ ./sshkey-mgr-admin gen <name>
 ```
-This action generates ssh key and its configuration in `sshkey/<name>/`. The structure is like below:
+This action generates ssh key and its configuration in `sshkey/<name>/`. The structure is as following:
 ```
 sshkey/<name>/
 ├── <name>
@@ -109,7 +109,7 @@ $ ./sshkey-mgr-admin deploy-s <name>
 ```
 This action sends the public key to server.
 
-After those two action, you can ssh to you server with the command below:
+After those two actions, you can ssh to your server with the command below:
 ```shell
 $ ssh <name>
 ```
@@ -154,7 +154,7 @@ For example, you have generate a key named `test` and you want to backup it to `
 $ ./sshkey-mgr-admin upload test xiaoming@192.168.20.1:~/sshkey-storage/
 ``` 
 
->The purpose we design this feature is to provide an interface to share the key with others or just backup your key(s). By using this sub-command, you can send the key to one's machine or a file share system such as Samba.
+> The purpose we design this feature is to provide an interface to share the key with others or just backup your key(s). By using this sub-command, you can send the key to one's machine or a file share system such as Samba.
 
 ## Fetch ssh key from remote
 This action fetchs the specified directory `<name>` from `<storage>` to your host.
@@ -166,11 +166,11 @@ For example:
 
 * You want to fetch the ssh key named `test` in `xiaoming@192.168.20.1:~/sshkey-storage/`
     ```shell
-    $ ./sshkey-mgr-admin update xiaoming@192.168.20.1:~/sshkey-storage/ test
+    $ ./sshkey-mgr-admin fetch xiaoming@192.168.20.1:~/sshkey-storage/ test
     ```
 * You want to fetch all the ssh key in `xiaoming@192.168.20.1:~/sshkey-storage/` 
     ```shell
-    $ ./sshkey-mgr-admin update xiaoming@192.168.20.1:~/sshkey-storage/ all
+    $ ./sshkey-mgr-admin fetch xiaoming@192.168.20.1:~/sshkey-storage/ all
     ```
 
 # For user
@@ -178,18 +178,18 @@ For example:
 ## Fetch ssh key from remote
 This action fetch the specified `<name>` directory from `<storage>` to your host.
 ```shell
-$ ./sshkey-mgr-user update <storage> <name>/all
+$ ./sshkey-mgr-user fetch <storage> <name>/all
 ```
 
 For example:
 
 * You want to fetch the ssh key named `test` in `xiaoming@192.168.20.1:~/sshkey-storage/`
     ```shell
-    $ ./sshkey-mgr-user update xiaoming@192.168.20.1:~/sshkey-storage/ test
+    $ ./sshkey-mgr-user fetch xiaoming@192.168.20.1:~/sshkey-storage/ test
     ```
 * You want to fetch all the ssh key in `xiaoming@192.168.20.1:~/sshkey-storage/` 
     ```shell
-    $ ./sshkey-mgr-user update xiaoming@192.168.20.1:~/sshkey-storage/ all
+    $ ./sshkey-mgr-user fetch xiaoming@192.168.20.1:~/sshkey-storage/ all
     ```
 
 ## Deploy the ssh configuration
@@ -199,7 +199,7 @@ $ ./sshkey-mgr-user deploy-c <name>
 ```
 This action deploys `<name>` ssh configuration on your host.
 
-After this action, you can ssh to you server.
+After this action, you can ssh to your server.
 ```shell
 $ ssh <name>
 ```
@@ -234,6 +234,6 @@ $ ./sshkey-mgr-user list
     ```
 
     This needs the sudo permission to copy configuration file `ssh` to `/etc/bash_completion.d/`.
-    After running the script, you need to open another terminal to check whether it is work.
+    After running the script, you need to open another terminal to check whether it works.
 
     > For more information about autocomplete configuration, see [here](https://debian-administration.org/article/317/An_introduction_to_bash_completion_part_2)
